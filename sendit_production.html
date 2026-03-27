@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SEND IT — Comunidad Escaladora</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --bg:#08080e;--bg2:#0f0f1a;--bg3:#141424;--bg4:#1a1a2e;
+  --border:#1e1e32;--border2:#2a2a42;
+  --accent:#ff5c1a;--accent2:#ff8040;--acg:#ff5c1a22;
+  --text:#e2e8f0;--text2:#94a3b8;--muted:#64748b;--muted2:#475569;
+  --green:#22c55e;--orange:#f97316;--red:#ef4444;--blue:#3b82f6;--purple:#a78bfa;
+  --r:12px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:#ff5c1a44;border-radius:2px;}
+input,textarea,select,button{font-family:'DM Sans',sans-serif;}
+
+/* HEADER */
+header{position:sticky;top:0;z-index:200;background:linear-gradient(180deg,#08080ef5,#08080ecc);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 20px;}
+.hdr{max-width:900px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px;}
+.logo{font-family:'Bebas Neue',cursive;font-size:26px;letter-spacing:4px;color:var(--accent);text-shadow:0 0 24px #ff5c1a44;cursor:pointer;}
+.logo span{font-size:8px;letter-spacing:5px;color:var(--muted);display:block;margin-top:-4px;}
+nav{display:flex;gap:3px;}
+.nb{padding:7px 13px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:500;transition:all .2s;background:transparent;color:var(--muted);}
+.nb:hover{color:var(--text);background:#ffffff0a;}
+.nb.active{background:var(--accent);color:#fff;}
+.hdr-user{position:relative;display:flex;align-items:center;gap:10px;}
+.hdr-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',cursive;font-size:13px;cursor:pointer;flex-shrink:0;}
+.ddmenu{position:absolute;top:44px;right:0;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:6px;min-width:160px;z-index:400;display:none;}
+.ddmenu.open{display:block;}
+.ddi{display:block;width:100%;padding:9px 14px;background:none;border:none;color:var(--text2);font-size:14px;cursor:pointer;border-radius:7px;text-align:left;transition:background .15s;}
+.ddi:hover{background:var(--border);color:var(--text);}
+
+/* LAYOUT */
+.page{display:none;max-width:900px;margin:0 auto;padding:24px 18px 100px;position:relative;z-index:1;}
+.page.active{display:block;}
+.two-col{display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start;}
+
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:14px;animation:fadeUp .35s ease both;}
+.card.hoverable{cursor:pointer;transition:border-color .2s,transform .2s;}
+.card.hoverable:hover{border-color:#ff5c1a55;transform:translateY(-2px);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+
+/* SECTION TITLE */
+.st{font-family:'Bebas Neue',cursive;font-size:22px;letter-spacing:3px;color:var(--accent);margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.st::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--accent)44,transparent);}
+
+/* AVATAR */
+.av{border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',cursive;letter-spacing:1px;flex-shrink:0;color:#fff;}
+
+/* BADGES & TAGS */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:5px;font-family:'Bebas Neue',cursive;font-size:13px;letter-spacing:1px;}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;margin-right:4px;margin-bottom:4px;}
+
+/* FORMS */
+.fl{display:block;font-size:10px;font-weight:700;letter-spacing:2px;color:var(--muted);margin-bottom:5px;text-transform:uppercase;}
+.fi,.fs,.ft{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:11px 15px;color:var(--text);font-size:14px;outline:none;margin-bottom:14px;transition:border-color .2s;appearance:none;}
+.fi:focus,.fs:focus,.ft:focus{border-color:var(--accent);}
+.ft{resize:vertical;min-height:80px;}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.fg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+
+/* BUTTONS */
+.btn{padding:11px 22px;border-radius:9px;border:none;cursor:pointer;font-size:14px;font-weight:600;transition:all .2s;}
+.btn-p{background:var(--accent);color:#fff;}
+.btn-p:hover{background:var(--accent2);transform:translateY(-1px);}
+.btn-g{background:transparent;color:var(--muted);border:1px solid var(--border);}
+.btn-g:hover{color:var(--text);border-color:#ffffff33;}
+.btn-row{display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;}
+.btn-sm{padding:6px 14px;border-radius:7px;border:none;cursor:pointer;font-size:12px;font-weight:600;transition:all .2s;}
+
+/* ACTIONS */
+.action-bar{display:flex;align-items:center;gap:4px;padding-top:12px;border-top:1px solid var(--border);margin-top:12px;}
+.act-btn{background:none;border:none;cursor:pointer;color:var(--muted2);font-size:13px;display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border-radius:8px;transition:all .2s;font-family:'DM Sans',sans-serif;}
+.act-btn:hover{background:var(--bg3);color:var(--text);}
+.act-btn.liked{color:var(--accent);}
+.act-btn.commented{color:var(--blue);}
+
+/* EMOJI */
+.emoji-bar{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px;}
+.emoji-btn{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:3px 9px;font-size:13px;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:4px;}
+.emoji-btn:hover{border-color:var(--accent);transform:scale(1.1);}
+.emoji-btn.active{background:var(--acg);border-color:var(--accent);}
+.emoji-btn span.ec{font-size:11px;color:var(--muted);font-family:'DM Sans',sans-serif;}
+
+/* COMMENTS */
+.comments-wrap{margin-top:12px;display:none;}
+.comments-wrap.open{display:block;}
+.comment-item{display:flex;gap:10px;margin-bottom:12px;}
+.comment-body{background:var(--bg3);border-radius:10px;padding:10px 13px;flex:1;}
+.comment-author{font-size:12px;font-weight:600;margin-bottom:3px;}
+.comment-text{font-size:13px;color:var(--text2);line-height:1.55;}
+.comment-date{font-size:11px;color:var(--muted);margin-top:4px;}
+.comment-input-row{display:flex;gap:8px;align-items:flex-end;margin-top:10px;}
+.comment-input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:9px 13px;color:var(--text);font-size:13px;outline:none;resize:none;min-height:40px;max-height:100px;transition:border-color .2s;font-family:'DM Sans',sans-serif;}
+.comment-input:focus{border-color:var(--accent);}
+.ep-row{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;}
+.ep-btn{background:none;border:none;cursor:pointer;font-size:18px;padding:2px 4px;border-radius:5px;transition:transform .15s;}
+.ep-btn:hover{transform:scale(1.25);}
+
+/* MODAL */
+.mo{display:none;position:fixed;inset:0;background:#000000cc;z-index:500;align-items:flex-end;justify-content:center;}
+.mo.open{display:flex;}
+.mb{background:var(--bg2);border:1px solid var(--border);border-radius:18px 18px 0 0;width:100%;max-width:700px;max-height:90vh;overflow-y:auto;padding:28px 24px 40px;animation:slideUp .3s ease;}
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.mt{font-family:'Bebas Neue',cursive;font-size:22px;letter-spacing:3px;color:var(--accent);margin-bottom:20px;}
+
+/* FAB */
+.fab{position:fixed;bottom:0;left:0;right:0;z-index:300;background:linear-gradient(0deg,var(--bg) 55%,transparent);padding:14px 20px 18px;display:flex;justify-content:center;gap:10px;}
+.fb{background:var(--accent);color:#fff;border:none;cursor:pointer;border-radius:12px;padding:12px 24px;font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;box-shadow:0 4px 24px #ff5c1a44;transition:all .2s;}
+.fb:hover{background:var(--accent2);transform:translateY(-2px);}
+
+/* AUTH */
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;position:relative;z-index:1;}
+.auth-box{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:40px 36px;width:100%;max-width:420px;}
+.auth-logo{font-family:'Bebas Neue',cursive;font-size:44px;letter-spacing:6px;color:var(--accent);text-align:center;text-shadow:0 0 40px #ff5c1a44;margin-bottom:4px;}
+.auth-sub{text-align:center;color:var(--muted);font-size:12px;letter-spacing:3px;margin-bottom:30px;}
+.auth-tabs{display:flex;gap:6px;margin-bottom:22px;}
+.at{flex:1;padding:10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:14px;font-weight:500;transition:all .2s;}
+.at.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.err{color:var(--red);font-size:13px;margin-bottom:12px;padding:10px 14px;background:#ef444418;border-radius:8px;border:1px solid #ef444433;}
+.ok{color:var(--green);font-size:13px;margin-bottom:12px;padding:10px 14px;background:#22c55e18;border-radius:8px;border:1px solid #22c55e33;}
+
+/* PROFILE HERO */
+.ph{background:linear-gradient(135deg,var(--bg2),var(--bg3));border:1px solid var(--border);border-radius:18px;padding:32px 24px;text-align:center;margin-bottom:20px;position:relative;overflow:hidden;}
+.ph::before{content:'';position:absolute;top:-50px;right:-50px;width:180px;height:180px;background:radial-gradient(circle,#ff5c1a1a,transparent 70%);pointer-events:none;}
+.pn{font-family:'Bebas Neue',cursive;font-size:28px;letter-spacing:3px;margin-top:12px;}
+.ps{display:flex;justify-content:center;gap:32px;margin-top:18px;}
+.psv{font-family:'Bebas Neue',cursive;font-size:32px;color:var(--accent);}
+.psl{font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;}
+
+/* MISC */
+.zone-hero{height:160px;border-radius:12px 12px 0 0;background:linear-gradient(135deg,#1a1a30,#0f0f20);display:flex;align-items:flex-end;padding:16px;position:relative;overflow:hidden;}
+.zone-hero::before{content:'🏔️';position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:80px;opacity:.15;}
+.tg{display:flex;gap:6px;margin-bottom:14px;}
+.tb{flex:1;padding:9px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:13px;font-weight:500;transition:all .2s;}
+.tb.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.swrap{position:relative;margin-bottom:16px;}
+.swrap .fi{padding-left:40px;margin-bottom:0;}
+.sico{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;}
+.sidebar-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:14px;}
+.sidebar-title{font-family:'Bebas Neue',cursive;font-size:16px;letter-spacing:2px;color:var(--accent);margin-bottom:12px;}
+.pill-tabs{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap;}
+.pt{padding:7px 16px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:13px;font-weight:500;transition:all .2s;}
+.pt.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.back{display:inline-flex;align-items:center;gap:6px;background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:7px 14px;cursor:pointer;font-size:13px;margin-bottom:18px;transition:all .2s;}
+.back:hover{color:var(--text);border-color:#ffffff33;}
+.empty{text-align:center;padding:48px 20px;color:var(--muted);font-size:14px;}
+.empty-ico{font-size:40px;margin-bottom:12px;}
+.metric-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+.metric{background:var(--bg3);border-radius:8px;padding:7px 11px;font-size:12px;color:var(--text2);display:flex;align-items:center;gap:5px;}
+.metric strong{color:var(--text);font-size:13px;}
+.sbox{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;}
+.sl{font-size:9px;font-weight:700;letter-spacing:2px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;}
+.sv{font-size:20px;font-weight:700;}
+.pbar{height:5px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-top:6px;}
+.pbfill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;}
+.div{height:1px;background:var(--border);margin:14px 0;}
+.row{display:flex;align-items:center;gap:10px;}
+.loading{text-align:center;padding:40px;color:var(--muted);font-size:14px;}
+.spinner{display:inline-block;width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:10px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+@media(max-width:660px){
+  .two-col{grid-template-columns:1fr;}
+  .sidebar{display:none;}
+  .fg,.fg3{grid-template-columns:1fr;}
+  .nb{padding:6px 9px;font-size:12px;}
+}
+</style>
+</head>
+<body>
+
+<!-- AUTH -->
+<div id="auth-screen" class="auth-wrap">
+  <div class="auth-box">
+    <div class="auth-logo">SEND IT</div>
+    <div class="auth-sub">COMUNIDAD ESCALADORA</div>
+    <div class="auth-tabs">
+      <button class="at active" onclick="authTab('login')">Iniciar sesión</button>
+      <button class="at" onclick="authTab('register')">Crear cuenta</button>
+    </div>
+    <div id="auth-msg"></div>
+    <div id="form-login">
+      <label class="fl">Email</label>
+      <input class="fi" id="l-email" type="email" placeholder="tu@email.com" autocomplete="email"/>
+      <label class="fl">Contraseña</label>
+      <input class="fi" id="l-pass" type="password" placeholder="••••••••"/>
+      <button class="btn btn-p" style="width:100%;margin-top:4px" id="login-btn" onclick="doLogin()">Entrar</button>
+    </div>
+    <div id="form-register" style="display:none">
+      <div class="fg">
+        <div><label class="fl">Nombre</label><input class="fi" id="r-nom" placeholder="Ana"/></div>
+        <div><label class="fl">Apellido</label><input class="fi" id="r-ape" placeholder="Torres"/></div>
+      </div>
+      <label class="fl">Usuario</label>
+      <input class="fi" id="r-usr" placeholder="anatorres"/>
+      <label class="fl">Email</label>
+      <input class="fi" id="r-eml" type="email" placeholder="ana@email.com"/>
+      <label class="fl">País</label>
+      <select class="fs" id="r-pai">
+        <option value="EC">🇪🇨 Ecuador</option><option value="CO">🇨🇴 Colombia</option>
+        <option value="PE">🇵🇪 Perú</option><option value="CL">🇨🇱 Chile</option>
+        <option value="AR">🇦🇷 Argentina</option><option value="MX">🇲🇽 México</option>
+        <option value="ES">🇪🇸 España</option><option value="US">🇺🇸 Estados Unidos</option>
+        <option value="OTHER">🌍 Otro</option>
+      </select>
+      <label class="fl">Contraseña</label>
+      <input class="fi" id="r-pas" type="password" placeholder="Mínimo 6 caracteres"/>
+      <button class="btn btn-p" style="width:100%;margin-top:4px" id="reg-btn" onclick="doRegister()">Crear cuenta</button>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none">
+  <header>
+    <div class="hdr">
+      <div class="logo" onclick="goTab('feed')">SEND IT<span>Comunidad Escaladora</span></div>
+      <nav>
+        <button class="nb active" data-tab="feed">🏠 Feed</button>
+        <button class="nb" data-tab="zones">🗺️ Zonas</button>
+        <button class="nb" data-tab="profile">👤 Perfil</button>
+      </nav>
+      <div class="hdr-user">
+        <div class="hdr-av av" id="hdr-av" onclick="toggleDD()"></div>
+        <div class="ddmenu" id="ddmenu">
+          <button class="ddi" onclick="goTab('profile');toggleDD()">👤 Mi perfil</button>
+          <button class="ddi" onclick="goTab('zones');toggleDD()">🗺️ Zonas</button>
+          <div style="height:1px;background:var(--border);margin:4px 0"></div>
+          <button class="ddi" onclick="doLogout()" style="color:var(--red)">🚪 Salir</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div id="page-feed" class="page active">
+    <div class="two-col">
+      <div><div class="st">FEED DE ACTIVIDAD</div><div id="feed-content"></div></div>
+      <div class="sidebar">
+        <div class="sidebar-card"><div class="sidebar-title">MI RESUMEN</div><div id="my-summary"></div></div>
+        <div class="sidebar-card"><div class="sidebar-title">ESCALADORES</div><div id="active-climbers"></div></div>
+      </div>
+    </div>
+  </div>
+  <div id="page-zones" class="page"><div id="zones-content"></div></div>
+  <div id="page-profile" class="page"><div id="profile-content"></div></div>
+  <div class="fab" id="fab"></div>
+</div>
+
+<!-- MODALS -->
+<div class="mo" id="mo-activity">
+  <div class="mb">
+    <div class="mt">📓 REGISTRAR ACTIVIDAD</div>
+    <label class="fl">Zona</label>
+    <select class="fs" id="act-zone" onchange="loadActRoutes()"></select>
+    <label class="fl">Vía</label>
+    <select class="fs" id="act-route"></select>
+    <label class="fl">Tipo</label>
+    <div class="tg">
+      <button class="tb active" id="act-t-send" onclick="setActType('send')">✅ Pegue</button>
+      <button class="tb" id="act-t-attempt" onclick="setActType('attempt')">🔁 Intento</button>
+      <button class="tb" id="act-t-project" onclick="setActType('project')">🎯 Proyecto</button>
+    </div>
+    <div class="fg">
+      <div><label class="fl">Intentos hoy</label><input class="fi" type="number" id="act-att" placeholder="ej. 4" min="1"/></div>
+      <div><label class="fl">Metros escalados</label><input class="fi" type="number" id="act-met" placeholder="ej. 120"/></div>
+    </div>
+    <label class="fl">Notas</label>
+    <textarea class="ft" id="act-notes" placeholder="¿Cómo fue? ¿Llegaste al crux?..."></textarea>
+    <label class="fl">Visibilidad</label>
+    <select class="fs" id="act-pub"><option value="1">🌐 Público</option><option value="0">🔒 Solo yo</option></select>
+    <div class="btn-row">
+      <button class="btn btn-p" id="act-submit" onclick="submitActivity()">Guardar</button>
+      <button class="btn btn-g" onclick="closeModal('mo-activity')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div class="mo" id="mo-zone">
+  <div class="mb">
+    <div class="mt">🏔️ NUEVA ZONA</div>
+    <div class="fg">
+      <div><label class="fl">Nombre</label><input class="fi" id="z-name" placeholder="ej. Cojitambo"/></div>
+      <div><label class="fl">País</label>
+        <select class="fs" id="z-country">
+          <option value="Ecuador">🇪🇨 Ecuador</option><option value="Colombia">🇨🇴 Colombia</option>
+          <option value="Perú">🇵🇪 Perú</option><option value="Chile">🇨🇱 Chile</option>
+          <option value="Argentina">🇦🇷 Argentina</option><option value="México">🇲🇽 México</option>
+          <option value="España">🇪🇸 España</option><option value="Internacional">🌍 Internacional</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg">
+      <div><label class="fl">Región</label><input class="fi" id="z-region" placeholder="ej. Cañar"/></div>
+      <div><label class="fl">Altitud</label><input class="fi" id="z-alt" placeholder="ej. 3200 msnm"/></div>
+    </div>
+    <label class="fl">Descripción</label><textarea class="ft" id="z-desc"></textarea>
+    <label class="fl">Cómo llegar</label><textarea class="ft" id="z-access"></textarea>
+    <label class="fl">Info adicional</label><textarea class="ft" id="z-info" style="min-height:65px"></textarea>
+    <div class="fg3">
+      <div><label class="fl">Estilo</label>
+        <select class="fs" id="z-style"><option>Deportiva</option><option>Boulder</option><option>Tradicional</option><option>Multipitch</option><option>Mixto</option></select>
+      </div>
+      <div><label class="fl">Nº vías</label><input class="fi" id="z-numr" type="number" placeholder="ej. 30"/></div>
+      <div><label class="fl">Grado máx.</label><input class="fi" id="z-maxg" placeholder="ej. 8b+"/></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-p" id="zone-submit" onclick="submitZone()">Crear zona</button>
+      <button class="btn btn-g" onclick="closeModal('mo-zone')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div class="mo" id="mo-route">
+  <div class="mb">
+    <div class="mt">➕ NUEVA VÍA</div>
+    <input type="hidden" id="nr-zid"/>
+    <div class="fg">
+      <div><label class="fl">Nombre</label><input class="fi" id="nr-name" placeholder="ej. La Langarota"/></div>
+      <div><label class="fl">Grado</label><input class="fi" id="nr-grade" placeholder="ej. 7b+"/></div>
+    </div>
+    <div class="fg3">
+      <div><label class="fl">Estilo</label><select class="fs" id="nr-style"><option>Deportiva</option><option>Boulder</option><option>Tradicional</option><option>Multipitch</option></select></div>
+      <div><label class="fl">Altura</label><input class="fi" id="nr-height" placeholder="ej. 30m"/></div>
+      <div><label class="fl">Chapas</label><input class="fi" id="nr-bolts" type="number" placeholder="12"/></div>
+    </div>
+    <label class="fl">Descripción</label><textarea class="ft" id="nr-desc" style="min-height:65px"></textarea>
+    <div class="btn-row">
+      <button class="btn btn-p" id="route-submit" onclick="submitRoute()">Agregar vía</button>
+      <button class="btn btn-g" onclick="closeModal('mo-route')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div class="mo" id="mo-alert">
+  <div class="mb">
+    <div class="mt">⚠️ ADVERTENCIA</div>
+    <input type="hidden" id="na-zid"/>
+    <label class="fl">Severidad</label>
+    <div class="tg">
+      <button class="tb" id="al-low" onclick="setAlSev('low')">🔷 Baja</button>
+      <button class="tb active" id="al-med" onclick="setAlSev('medium')">🔶 Media</button>
+      <button class="tb" id="al-hi" onclick="setAlSev('high')">⚠️ Alta</button>
+    </div>
+    <label class="fl">Título</label><input class="fi" id="na-title" placeholder="ej. Vía cerrada"/>
+    <label class="fl">Descripción</label><textarea class="ft" id="na-content"></textarea>
+    <div class="btn-row">
+      <button class="btn btn-p" id="alert-submit" onclick="submitAlert()">Publicar</button>
+      <button class="btn btn-g" onclick="closeModal('mo-alert')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── SUPABASE INIT ─────────────────────────────────
+const SUPABASE_URL = 'https://cyryjailzfdootfguajc.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN5cnlqYWlsemZkb290Zmd1YWpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NDU2NjYsImV4cCI6MjA5MDIyMTY2Nn0.6sNEuy1igT1NcJvaaM0uNjgZEw9QUbWotDdiAeWUHX8';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ── CONSTANTS ─────────────────────────────────────
+const EMOJIS = ['🔥','💪','🧗','👏','🙌','🏆','❤️','😮'];
+const cflag = {EC:'🇪🇨',CO:'🇨🇴',PE:'🇵🇪',CL:'🇨🇱',AR:'🇦🇷',MX:'🇲🇽',ES:'🇪🇸',US:'🇺🇸'};
+const avColors = ['#ff5c1a','#3b82f6','#22c55e','#a78bfa','#f97316','#ec4899','#06b6d4'];
+const avC = s => avColors[(s||'?').charCodeAt(0)%avColors.length];
+const gradeN = g => parseFloat((g||'0').replace(/[^0-9.]/g,''));
+const gradeColor = g => { const n=gradeN(g); if(n<=6)return'#22c55e'; if(n<7)return'#84cc16'; if(n<=7.5)return'#eab308'; if(n<=8)return'#f97316'; return'#ef4444'; };
+const sevC = {high:'#ef4444',medium:'#f97316',low:'#3b82f6'};
+const sevL = {high:'⚠️ Alta',medium:'🔶 Media',low:'🔷 Baja'};
+const typeL = {send:'✅ Pegue',attempt:'🔁 Intento',project:'🎯 Proyecto'};
+const typeC = {send:'#22c55e',attempt:'#f97316',project:'#3b82f6'};
+const cflagByName = n => ({'Ecuador':'🇪🇨','Colombia':'🇨🇴','Perú':'🇵🇪','Chile':'🇨🇱','Argentina':'🇦🇷','México':'🇲🇽','España':'🇪🇸','Internacional':'🌍'}[n]||'🌍');
+const fmt = d => new Date(d).toLocaleDateString('es-EC',{day:'numeric',month:'short',year:'numeric'});
+const $ = id => document.getElementById(id);
+
+// ── STATE ─────────────────────────────────────────
+let CU = null; // current user profile
+let currentTab = 'feed';
+let viewingZoneId = null;
+let viewingUserId = null;
+let actType = 'send';
+let alSev = 'medium';
+let openComments = {};
+let cachedZones = [];
+let cachedUsers = [];
+
+// ── HELPERS ───────────────────────────────────────
+function avHTML(p, size=36) {
+  if (!p) return `<div class="av" style="width:${size}px;height:${size}px;background:#333"></div>`;
+  const i = ((p.nombre||'?')[0]+((p.apellido||'')[0]||'')).toUpperCase();
+  const c = avC(p.username||'?');
+  return `<div class="av" style="width:${size}px;height:${size}px;font-size:${Math.round(size*.36)}px;background:linear-gradient(135deg,${c},${c}99);cursor:pointer" onclick="openUserProfile('${p.id}')">${i}</div>`;
+}
+function gradeBadge(g) {
+  const c = gradeColor(g);
+  return `<span class="badge" style="background:${c}22;color:${c};border:1px solid ${c}44">${g}</span>`;
+}
+function tag(t,color='#ff5c1a') {
+  return `<span class="tag" style="background:${color}18;color:${color};border:1px solid ${color}33">${t}</span>`;
+}
+function loading() { return `<div class="loading"><div class="spinner"></div><br>Cargando...</div>`; }
+function showMsg(msg, type='err') {
+  $('auth-msg').innerHTML = `<div class="${type==='ok'?'ok':'err'}">${msg}</div>`;
+}
+function setBtnLoading(id, loading, text) {
+  const b=$(id); if(!b)return;
+  b.disabled=loading; b.textContent=loading?'Guardando...':text;
+}
+
+// ── AUTH ──────────────────────────────────────────
+function authTab(t) {
+  $('form-login').style.display=t==='login'?'block':'none';
+  $('form-register').style.display=t==='register'?'block':'none';
+  document.querySelectorAll('.at').forEach((b,i)=>b.classList.toggle('active',i===(t==='login'?0:1)));
+  $('auth-msg').innerHTML='';
+}
+
+async function doLogin() {
+  const email=$('l-email').value.trim();
+  const pass=$('l-pass').value;
+  if(!email||!pass){showMsg('Ingresa email y contraseña.');return;}
+  setBtnLoading('login-btn',true,'Entrar');
+  const {data,error} = await sb.auth.signInWithPassword({email,password:pass});
+  setBtnLoading('login-btn',false,'Entrar');
+  if(error){showMsg('Email o contraseña incorrectos.');return;}
+  await loadSession(data.user);
+}
+
+async function doRegister() {
+  const nom=$('r-nom').value.trim(),ape=$('r-ape').value.trim();
+  const usr=$('r-usr').value.trim().toLowerCase();
+  const eml=$('r-eml').value.trim().toLowerCase();
+  const pai=$('r-pai').value, pas=$('r-pas').value;
+  if(!nom||!ape||!usr||!eml||!pas){showMsg('Completa todos los campos.');return;}
+  if(pas.length<6){showMsg('Contraseña mínimo 6 caracteres.');return;}
+  if(!/^[a-z0-9_]+$/.test(usr)){showMsg('Usuario solo puede tener letras, números y _.');return;}
+  setBtnLoading('reg-btn',true,'Crear cuenta');
+  const {data,error} = await sb.auth.signUp({
+    email:eml, password:pas,
+    options:{data:{username:usr,nombre:nom,apellido:ape,pais:pai}}
+  });
+  setBtnLoading('reg-btn',false,'Crear cuenta');
+  if(error){showMsg(error.message);return;}
+  showMsg('¡Cuenta creada! Revisa tu email para confirmar.','ok');
+}
+
+async function doLogout() {
+  await sb.auth.signOut();
+  CU=null; viewingZoneId=null; viewingUserId=null; openComments={};
+  $('app').style.display='none';
+  $('auth-screen').style.display='flex';
+  toggleDD(true);
+}
+
+async function loadSession(user) {
+  if(!user)return;
+  const {data:profile} = await sb.from('profiles').select('*').eq('id',user.id).single();
+  if(!profile)return;
+  CU=profile;
+  $('auth-screen').style.display='none';
+  $('app').style.display='block';
+  updateHeaderUI();
+  await goTab('feed');
+}
+
+function updateHeaderUI() {
+  if(!CU)return;
+  const i=((CU.nombre||'?')[0]+((CU.apellido||'')[0]||'')).toUpperCase();
+  const c=avC(CU.username||'?');
+  $('hdr-av').textContent=i;
+  $('hdr-av').style.background=`linear-gradient(135deg,${c},${c}99)`;
+}
+
+function toggleDD(fc=false) {
+  const m=$('ddmenu');
+  if(fc){m.classList.remove('open');return;}
+  m.classList.toggle('open');
+}
+document.addEventListener('click',e=>{if(!e.target.closest('.hdr-user'))$('ddmenu').classList.remove('open');});
+
+// ── NAVIGATION ────────────────────────────────────
+async function goTab(tab) {
+  currentTab=tab; viewingZoneId=null; viewingUserId=null; openComments={};
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  $(`page-${tab}`).classList.add('active');
+  document.querySelectorAll('.nb').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
+  if(tab==='feed') await renderFeed();
+  else if(tab==='zones') await renderZones();
+  else if(tab==='profile'){viewingUserId=CU.id; await renderProfile();}
+  renderFAB();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('.nb').forEach(b=>b.addEventListener('click',()=>goTab(b.dataset.tab)));
+
+async function openUserProfile(uid) {
+  viewingUserId=uid; currentTab='profile';
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  $('page-profile').classList.add('active');
+  document.querySelectorAll('.nb').forEach(b=>b.classList.toggle('active',b.dataset.tab==='profile'));
+  await renderProfile(); renderFAB();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── FEED ──────────────────────────────────────────
+async function renderFeed() {
+  $('feed-content').innerHTML=loading();
+  const {data:acts} = await sb.from('activities')
+    .select(`*, profiles(*), zones(name), routes(name,grade)`)
+    .eq('is_public',true).order('created_at',{ascending:false}).limit(30);
+
+  const {data:myLikes} = await sb.from('likes').select('activity_id').eq('user_id',CU.id);
+  const {data:myReactions} = await sb.from('reactions').select('activity_id,emoji').eq('user_id',CU.id);
+  const {data:allLikes} = await sb.from('likes').select('activity_id,user_id');
+  const {data:allReactions} = await sb.from('reactions').select('activity_id,emoji,user_id');
+  const {data:allComments} = await sb.from('comments').select(`*,profiles(*)`).not('activity_id','is',null).order('created_at',{ascending:true});
+  const {data:follows} = await sb.from('follows').select('following_id').eq('follower_id',CU.id);
+
+  const myLikeSet=new Set((myLikes||[]).map(l=>l.activity_id));
+  const myReactSet={};
+  (myReactions||[]).forEach(r=>{if(!myReactSet[r.activity_id])myReactSet[r.activity_id]={};myReactSet[r.activity_id][r.emoji]=true;});
+  const likeCount={};
+  (allLikes||[]).forEach(l=>{likeCount[l.activity_id]=(likeCount[l.activity_id]||0)+1;});
+  const emojiCount={};
+  (allReactions||[]).forEach(r=>{if(!emojiCount[r.activity_id])emojiCount[r.activity_id]={};if(!emojiCount[r.activity_id][r.emoji])emojiCount[r.activity_id][r.emoji]=0;emojiCount[r.activity_id][r.emoji]++;});
+  const commentsByAct={};
+  (allComments||[]).forEach(c=>{if(!commentsByAct[c.activity_id])commentsByAct[c.activity_id]=[];commentsByAct[c.activity_id].push(c);});
+  const followingSet=new Set((follows||[]).map(f=>f.following_id));
+
+  const myActs=(acts||[]).filter(a=>a.user_id===CU.id);
+  const prioActs=(acts||[]).filter(a=>followingSet.has(a.user_id));
+  const otherActs=(acts||[]).filter(a=>a.user_id!==CU.id&&!followingSet.has(a.user_id));
+  const ordered=[...myActs,...prioActs,...otherActs];
+
+  $('feed-content').innerHTML=ordered.length===0
+    ?`<div class="empty"><div class="empty-ico">🧗</div>Sé el primero en registrar un ascenso.</div>`
+    :ordered.map(a=>renderActCard(a,myLikeSet,myReactSet,likeCount,emojiCount,commentsByAct)).join('');
+
+  // Sidebar
+  const totalM=myActs.reduce((s,a)=>s+(a.meters||0),0);
+  const mySends=myActs.filter(a=>a.type==='send').length;
+  $('my-summary').innerHTML=`<div class="fg3">
+    <div class="sbox"><div class="sl">Pegues</div><div class="sv" style="color:var(--green)">${mySends}</div></div>
+    <div class="sbox"><div class="sl">Metros</div><div class="sv" style="color:var(--accent)">${totalM}m</div></div>
+    <div class="sbox"><div class="sl">Sesiones</div><div class="sv">${myActs.length}</div></div>
+  </div>`;
+
+  const {data:allUsers} = await sb.from('profiles').select('*').neq('id',CU.id).limit(6);
+  cachedUsers=allUsers||[];
+  $('active-climbers').innerHTML=(allUsers||[]).map(u=>{
+    const isF=followingSet.has(u.id);
+    return `<div class="row" style="margin-bottom:12px;justify-content:space-between">
+      <div class="row" style="gap:8px">${avHTML(u,32)}
+        <div>
+          <div style="font-size:13px;font-weight:600">${u.nombre} ${u.apellido}</div>
+          <div style="font-size:11px;color:var(--muted)">${cflag[u.pais]||'🌍'} ${u.sends} pegues</div>
+        </div>
+      </div>
+      <button onclick="toggleFollow('${u.id}','${isF}')" style="padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:${isF?'var(--accent)':'transparent'};color:${isF?'#fff':'var(--muted)'};font-size:12px;cursor:pointer">
+        ${isF?'✓ Sig.':'+ Seguir'}
+      </button>
+    </div>`;
+  }).join('');
+}
+
+function renderActCard(a,myLikeSet,myReactSet,likeCount,emojiCount,commentsByAct) {
+  const p=a.profiles;
+  const liked=myLikeSet.has(a.id);
+  const lc=likeCount[a.id]||0;
+  const ec=emojiCount[a.id]||{};
+  const myR=myReactSet[a.id]||{};
+  const comments=commentsByAct[a.id]||[];
+  const isOpen=!!openComments[a.id];
+  const isOwn=a.user_id===CU.id;
+
+  const emojiDisplay=Object.entries(ec).filter(([,n])=>n>0).map(([e,n])=>
+    `<button class="emoji-btn ${myR[e]?'active':''}" onclick="toggleReaction('${a.id}','${e}')">
+      ${e}<span class="ec">${n}</span>
+    </button>`).join('');
+
+  return `<div class="card">
+    <div class="row" style="margin-bottom:12px">
+      ${avHTML(p,40)}
+      <div style="flex:1">
+        <div style="font-weight:600;font-size:14px;cursor:pointer" onclick="openUserProfile('${p?.id||''}')">${p?.nombre||''} ${p?.apellido||''} ${isOwn?'<span style="font-size:11px;color:var(--muted)">(tú)</span>':''}</div>
+        <div style="font-size:12px;color:var(--muted)">${fmt(a.created_at)} · ${a.zones?.name||''}</div>
+      </div>
+      ${tag(typeL[a.type],typeC[a.type])}
+    </div>
+    ${a.routes?`<div style="margin-bottom:10px;cursor:pointer" onclick="openZone('${a.zone_id}')">
+      <span style="font-family:'Bebas Neue',cursive;font-size:19px;letter-spacing:1px">${a.routes.name}</span>
+      <span style="margin-left:8px">${gradeBadge(a.routes.grade)}</span>
+      <span style="margin-left:8px;font-size:12px;color:var(--muted)">${a.zones?.name||''}</span>
+    </div>`:''}
+    <div class="metric-row">
+      ${a.attempts?`<div class="metric">🔁 <strong>${a.attempts}</strong> intento${a.attempts>1?'s':''}</div>`:''}
+      ${a.meters?`<div class="metric">📏 <strong>${a.meters}m</strong> escalados</div>`:''}
+    </div>
+    ${a.notes?`<p style="font-size:14px;color:#94a3b8;line-height:1.7;margin-bottom:10px">${a.notes}</p>`:''}
+    ${emojiDisplay?`<div class="emoji-bar">${emojiDisplay}</div>`:''}
+    <div class="action-bar">
+      <button class="act-btn ${liked?'liked':''}" onclick="toggleLike('${a.id}','${liked}')">
+        ${liked?'🔥':'🤍'} ${lc} Me gusta
+      </button>
+      <div style="flex:1"></div>
+      ${EMOJIS.slice(0,4).map(e=>`<button class="act-btn" onclick="toggleReaction('${a.id}','${e}')" style="padding:4px 7px">${e}</button>`).join('')}
+    </div>
+    <div class="action-bar" style="border-top:none;padding-top:4px">
+      <button class="act-btn ${isOpen?'commented':''}" onclick="toggleComments('${a.id}')">
+        💬 ${comments.length} comentario${comments.length!==1?'s':''}
+      </button>
+    </div>
+    <div class="comments-wrap ${isOpen?'open':''}" id="cw-${a.id}">
+      ${comments.map(c=>`<div class="comment-item">
+        ${avHTML(c.profiles,28)}
+        <div class="comment-body">
+          <div class="comment-author" style="color:${avC(c.profiles?.username||'?')}">${c.profiles?.nombre||''} ${c.profiles?.apellido||''}</div>
+          <div class="comment-text">${c.content}</div>
+          <div class="comment-date">${fmt(c.created_at)}</div>
+        </div>
+      </div>`).join('')}
+      <div class="ep-row">${EMOJIS.map(e=>`<button class="ep-btn" onclick="insertEmoji('ci-${a.id}','${e}')">${e}</button>`).join('')}</div>
+      <div class="comment-input-row">
+        ${avHTML(CU,28)}
+        <textarea class="comment-input" id="ci-${a.id}" placeholder="Escribe un comentario..." rows="1"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();addComment('${a.id}')}"></textarea>
+        <button class="btn-sm btn-p" onclick="addComment('${a.id}')" style="padding:8px 14px">→</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── INTERACTIONS ──────────────────────────────────
+async function toggleLike(actId, wasLiked) {
+  if(wasLiked==='true'||wasLiked===true) {
+    await sb.from('likes').delete().eq('user_id',CU.id).eq('activity_id',actId);
+  } else {
+    await sb.from('likes').insert({user_id:CU.id,activity_id:actId});
+  }
+  await renderFeed();
+}
+
+async function toggleReaction(actId, emoji) {
+  const {data:existing} = await sb.from('reactions').select('*').eq('user_id',CU.id).eq('activity_id',actId).eq('emoji',emoji).single();
+  if(existing) await sb.from('reactions').delete().eq('user_id',CU.id).eq('activity_id',actId).eq('emoji',emoji);
+  else await sb.from('reactions').insert({user_id:CU.id,activity_id:actId,emoji});
+  await renderFeed();
+}
+
+function toggleComments(actId) {
+  openComments[actId]=!openComments[actId];
+  const cw=$(`cw-${actId}`);
+  if(cw)cw.classList.toggle('open',!!openComments[actId]);
+  const btn=document.querySelector(`[onclick="toggleComments('${actId}')"]`);
+  if(btn)btn.classList.toggle('commented',!!openComments[actId]);
+}
+
+function insertEmoji(inputId,emoji) {
+  const inp=$(inputId);
+  if(inp){inp.value+=emoji;inp.focus();}
+}
+
+async function addComment(actId) {
+  const inp=$(`ci-${actId}`);
+  if(!inp)return;
+  const content=inp.value.trim();
+  if(!content)return;
+  inp.value='';
+  await sb.from('comments').insert({user_id:CU.id,activity_id:actId,content});
+  openComments[actId]=true;
+  await renderFeed();
+}
+
+async function toggleFollow(userId, wasFollowing) {
+  if(wasFollowing==='true'||wasFollowing===true) {
+    await sb.from('follows').delete().eq('follower_id',CU.id).eq('following_id',userId);
+  } else {
+    await sb.from('follows').insert({follower_id:CU.id,following_id:userId});
+  }
+  await renderFeed();
+}
+
+// ── ZONES ─────────────────────────────────────────
+async function renderZones() {
+  if(viewingZoneId){await renderZoneDetail();return;}
+  $('zones-content').innerHTML=loading();
+  const {data:zones} = await sb.from('zones').select('*').order('name');
+  cachedZones=zones||[];
+  const byCountry={};
+  (zones||[]).forEach(z=>{if(!byCountry[z.country])byCountry[z.country]=[];byCountry[z.country].push(z);});
+
+  $('zones-content').innerHTML=`
+    <div class="st">ZONAS DE ESCALADA</div>
+    <div class="pill-tabs" id="ctabs">
+      <button class="pt active" onclick="filterZ('all',this)">🌍 Todas</button>
+      ${Object.keys(byCountry).map(c=>`<button class="pt" onclick="filterZ('${c}',this)">${cflagByName(c)} ${c}</button>`).join('')}
+    </div>
+    <div class="swrap"><span class="sico">🔍</span><input class="fi" id="zsearch" placeholder="Buscar zona, región..." oninput="filterZ(window.zFilter,null)" style="margin-bottom:0"/></div>
+    <div id="zgrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px"></div>
+  `;
+  window.zFilter='all';
+  filterZ('all',null);
+}
+
+function filterZ(country,btn) {
+  if(country!==null)window.zFilter=country;
+  if(btn){document.querySelectorAll('#ctabs .pt').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+  const q=($('zsearch')?.value||'').toLowerCase();
+  let zones=cachedZones;
+  if(window.zFilter!=='all')zones=zones.filter(z=>z.country===window.zFilter);
+  if(q)zones=zones.filter(z=>z.name.toLowerCase().includes(q)||z.region.toLowerCase().includes(q));
+  const grid=$('zgrid');
+  if(!grid)return;
+  grid.innerHTML=zones.map(z=>`
+    <div class="card hoverable" onclick="openZone('${z.id}')" style="padding:0;overflow:hidden;margin-bottom:0">
+      <div class="zone-hero">
+        <div>
+          <div style="font-family:'Bebas Neue',cursive;font-size:22px;letter-spacing:2px">${z.name}</div>
+          <div style="font-size:12px;color:#94a3b8">${cflagByName(z.country)} ${z.country} · ${z.region}</div>
+        </div>
+      </div>
+      <div style="padding:14px">
+        <div style="margin-bottom:10px">${tag(z.style)}${z.max_grade?tag(z.max_grade,gradeColor(z.max_grade)):''}${z.alt?tag(z.alt,'#64748b'):''}</div>
+        <p style="font-size:13px;color:#64748b;line-height:1.6;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${z.description}</p>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function openZone(id) {
+  viewingZoneId=id; await renderZoneDetail(); renderFAB();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+async function renderZoneDetail() {
+  currentTab='zones';
+  $('zones-content').innerHTML=loading();
+  const {data:z} = await sb.from('zones').select('*').eq('id',viewingZoneId).single();
+  const {data:routes} = await sb.from('routes').select('*').eq('zone_id',viewingZoneId).order('grade');
+  const {data:alerts} = await sb.from('alerts').select(`*,profiles(*)`).eq('zone_id',viewingZoneId).order('created_at',{ascending:false});
+  const {data:acts} = await sb.from('activities').select(`*,profiles(*),routes(name,grade)`).eq('zone_id',viewingZoneId).eq('is_public',true).order('created_at',{ascending:false}).limit(10);
+  const {data:alertLikes} = await sb.from('alert_likes').select('alert_id,user_id');
+  const {data:alertComments} = await sb.from('comments').select(`*,profiles(*)`).not('alert_id','is',null).order('created_at',{ascending:true});
+
+  const alLikeCount={}, myAlLikes=new Set();
+  (alertLikes||[]).forEach(l=>{alLikeCount[l.alert_id]=(alLikeCount[l.alert_id]||0)+1;if(l.user_id===CU.id)myAlLikes.add(l.alert_id);});
+  const alComByAlert={};
+  (alertComments||[]).forEach(c=>{if(!alComByAlert[c.alert_id])alComByAlert[c.alert_id]=[];alComByAlert[c.alert_id].push(c);});
+
+  const totalS=(routes||[]).reduce((s,r)=>s+r.sends,0);
+  const totalA=(routes||[]).reduce((s,r)=>s+r.attempts,0);
+
+  $('zones-content').innerHTML=`
+    <button class="back" onclick="closeZone()">← Volver</button>
+    <div class="card" style="padding:0;overflow:hidden;margin-bottom:18px">
+      <div class="zone-hero" style="height:180px;background:linear-gradient(135deg,#1a1a30,#0a0a18)">
+        <div>
+          <div style="font-size:9px;letter-spacing:3px;color:var(--muted);margin-bottom:4px">ZONA DE ESCALADA</div>
+          <div style="font-family:'Bebas Neue',cursive;font-size:32px;letter-spacing:3px">${z.name}</div>
+          <div style="font-size:13px;color:#94a3b8">${cflagByName(z.country)} ${z.country} · ${z.region} · ${z.alt}</div>
+        </div>
+      </div>
+      <div style="padding:18px">
+        <div class="fg3" style="margin-bottom:16px">
+          ${[['Vías',(routes||[]).length],['Pegues',totalS],['Intentos',totalA],['Grado máx',z.max_grade||'—'],['Estilo',z.style],['Alertas',(alerts||[]).length]].map(([l,v])=>`<div class="sbox"><div class="sl">${l}</div><div class="sv">${v}</div></div>`).join('')}
+        </div>
+        <div class="div"></div>
+        ${z.description?`<div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--muted);margin-bottom:8px">DESCRIPCIÓN</div><p style="font-size:14px;color:#94a3b8;line-height:1.7;margin-bottom:16px">${z.description}</p>`:''}
+        ${z.access?`<div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--muted);margin-bottom:8px">📍 CÓMO LLEGAR</div><p style="font-size:14px;color:#94a3b8;line-height:1.7;margin-bottom:${z.info?'16px':'0'}">${z.access}</p>`:''}
+        ${z.info?`<div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--muted);margin-bottom:8px">ℹ️ INFO</div><p style="font-size:14px;color:#94a3b8;line-height:1.7">${z.info}</p>`:''}
+      </div>
+    </div>
+
+    ${(alerts||[]).length?`
+      <div class="st">⚠️ ALERTAS</div>
+      ${(alerts||[]).map(al=>{
+        const lc=alLikeCount[al.id]||0, liked=myAlLikes.has(al.id);
+        const alComs=alComByAlert[al.id]||[], isOpen=!!openComments[al.id];
+        return `<div class="card" style="border-left:3px solid ${sevC[al.severity]}">
+          <div class="row" style="margin-bottom:8px;justify-content:space-between">
+            <div style="font-family:'Bebas Neue',cursive;font-size:17px;letter-spacing:1px">${al.title}</div>
+            <span class="badge" style="background:${sevC[al.severity]}22;color:${sevC[al.severity]};border:1px solid ${sevC[al.severity]}44;font-size:11px">${sevL[al.severity]}</span>
+          </div>
+          <p style="font-size:14px;color:#94a3b8;line-height:1.6;margin-bottom:10px">${al.content}</p>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:10px">${fmt(al.created_at)}</div>
+          <div class="action-bar">
+            <button class="act-btn ${liked?'liked':''}" onclick="toggleAlertLike('${al.id}','${liked}')">👍 ${lc} Útil</button>
+            <button class="act-btn ${isOpen?'commented':''}" onclick="toggleAlertComments('${al.id}')">💬 ${alComs.length} comentarios</button>
+          </div>
+          <div class="comments-wrap ${isOpen?'open':''}" id="alc-${al.id}">
+            ${alComs.map(c=>`<div class="comment-item">${avHTML(c.profiles,28)}<div class="comment-body"><div class="comment-author" style="color:${avC(c.profiles?.username||'?')}">${c.profiles?.nombre||''} ${c.profiles?.apellido||''}</div><div class="comment-text">${c.content}</div><div class="comment-date">${fmt(c.created_at)}</div></div></div>`).join('')}
+            <div class="comment-input-row">
+              ${avHTML(CU,28)}
+              <textarea class="comment-input" id="aci-${al.id}" placeholder="Comenta..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();addAlertComment('${al.id}')}"></textarea>
+              <button class="btn-sm btn-p" onclick="addAlertComment('${al.id}')" style="padding:8px 14px">→</button>
+            </div>
+          </div>
+        </div>`;
+      }).join('')}
+    `:''}
+
+    <div class="st">VÍAS (${(routes||[]).length})</div>
+    ${(routes||[]).length===0?`<div class="empty"><div class="empty-ico">🧗</div>Sin vías aún.</div>`:''}
+    ${(routes||[]).map(r=>`<div class="card">
+      <div class="row" style="margin-bottom:8px"><div style="flex:1"><span style="font-family:'Bebas Neue',cursive;font-size:19px;letter-spacing:1px">${r.name}</span></div>${gradeBadge(r.grade)}</div>
+      <div style="margin-bottom:8px">${tag('⛰ '+r.style)}${r.height?tag(r.height,'#64748b'):''}${r.bolts?tag(r.bolts+' chapas','#64748b'):''}</div>
+      ${r.description?`<p style="font-size:13px;color:#64748b;line-height:1.6;margin-bottom:10px">${r.description}</p>`:''}
+      <div class="row" style="gap:16px;font-size:12px;color:var(--muted)"><span>✅ ${r.sends} pegues</span><span>🔁 ${r.attempts} intentos</span>${r.attempts?`<span>📈 ${Math.round(r.sends/r.attempts*100)}% éxito</span>`:''}</div>
+      ${r.attempts>0?`<div class="pbar"><div class="pbfill" style="width:${Math.min(100,Math.round(r.sends/r.attempts*100))}%"></div></div>`:''}
+    </div>`).join('')}
+
+    <div class="st">ACTIVIDAD RECIENTE</div>
+    ${(acts||[]).length===0?`<div class="empty"><div class="empty-ico">📓</div>Sin actividad aún.</div>`:''}
+    ${(acts||[]).map(a=>renderActCard(a,new Set(),{},{},{},{})).join('')}
+  `;
+}
+
+function toggleAlertComments(alertId) {
+  openComments[alertId]=!openComments[alertId];
+  const cw=$(`alc-${alertId}`);
+  if(cw)cw.classList.toggle('open',!!openComments[alertId]);
+}
+
+async function toggleAlertLike(alertId, wasLiked) {
+  if(wasLiked==='true') await sb.from('alert_likes').delete().eq('user_id',CU.id).eq('alert_id',alertId);
+  else await sb.from('alert_likes').insert({user_id:CU.id,alert_id:alertId});
+  await renderZoneDetail();
+}
+
+async function addAlertComment(alertId) {
+  const inp=$(`aci-${alertId}`);
+  if(!inp)return;
+  const content=inp.value.trim();
+  if(!content)return;
+  inp.value='';
+  await sb.from('comments').insert({user_id:CU.id,alert_id:alertId,content});
+  openComments[alertId]=true;
+  await renderZoneDetail();
+}
+
+async function closeZone() { viewingZoneId=null; await renderZones(); renderFAB(); }
+
+// ── PROFILE ───────────────────────────────────────
+async function renderProfile() {
+  $('profile-content').innerHTML=loading();
+  const uid=viewingUserId||CU.id;
+  const {data:u} = await sb.from('profiles').select('*').eq('id',uid).single();
+  if(!u)return;
+  const isMe=uid===CU.id;
+  const {data:acts} = await sb.from('activities').select(`*,zones(name),routes(name,grade)`).eq('user_id',uid).order('created_at',{ascending:false}).limit(20);
+  const {data:following} = await sb.from('follows').select('following_id').eq('follower_id',uid);
+  const {data:followers} = await sb.from('follows').select('follower_id').eq('following_id',uid);
+  const {data:isFollowingMe} = await sb.from('follows').select('*').eq('follower_id',CU.id).eq('following_id',uid).single();
+  const {data:wallComs} = await sb.from('comments').select(`*,profiles(*)`).eq('target_user_id',uid).order('created_at',{ascending:false}).limit(20);
+
+  const myActs=acts||[], totalM=myActs.reduce((s,a)=>s+(a.meters||0),0);
+  const sends=myActs.filter(a=>a.type==='send').length;
+  const sendActs=myActs.filter(a=>a.type==='send');
+  let bestG='—';
+  if(sendActs.length>0){const gs=sendActs.map(a=>a.routes?.grade).filter(Boolean);if(gs.length)bestG=gs.sort((a,b)=>gradeN(b)-gradeN(a))[0];}
+
+  $('profile-content').innerHTML=`
+    <div class="ph">
+      <div style="display:flex;justify-content:center">${avHTML(u,72)}</div>
+      <div class="pn">${u.nombre} ${u.apellido}</div>
+      <div style="color:var(--muted);font-size:13px;margin-top:4px">${cflag[u.pais]||'🌍'} · @${u.username}</div>
+      ${u.bio?`<div style="font-size:13px;color:var(--text2);margin-top:8px;font-style:italic">"${u.bio}"</div>`:''}
+      <div class="ps">
+        <div><div class="psv">${sends}</div><div class="psl">Pegues</div></div>
+        <div><div class="psv">${bestG}</div><div class="psl">Grado máx</div></div>
+        <div><div class="psv">${totalM}m</div><div class="psl">Metros</div></div>
+        <div><div class="psv">${myActs.length}</div><div class="psl">Sesiones</div></div>
+      </div>
+      ${!isMe?`<div style="margin-top:16px">
+        <button id="follow-btn" onclick="toggleFollow('${uid}','${!!isFollowingMe}')" style="padding:10px 24px;border-radius:9px;border:1px solid var(--border);background:${isFollowingMe?'var(--accent)':'transparent'};color:${isFollowingMe?'#fff':'var(--muted)'};font-size:14px;font-weight:600;cursor:pointer">
+          ${isFollowingMe?'✓ Siguiendo':'+ Seguir'}
+        </button>
+      </div>`:''}
+      <div class="row" style="justify-content:center;gap:20px;margin-top:12px;font-size:12px;color:var(--muted)">
+        <span>${(following||[]).length} siguiendo</span>
+        <span>${(followers||[]).length} seguidores</span>
+      </div>
+    </div>
+
+    <div class="st">💬 MURO</div>
+    <div class="card">
+      <div class="ep-row">${EMOJIS.map(e=>`<button class="ep-btn" onclick="insertEmoji('wall-input-${uid}','${e}')">${e}</button>`).join('')}</div>
+      <div class="comment-input-row">
+        ${avHTML(CU,32)}
+        <textarea class="comment-input" id="wall-input-${uid}" placeholder="${isMe?'Escribe en tu muro...':'Escribe en el muro de '+u.nombre+'...'}" rows="2"></textarea>
+        <button class="btn-sm btn-p" onclick="addWallComment('${uid}')" style="padding:10px 14px">→</button>
+      </div>
+      <div style="margin-top:14px">
+        ${(wallComs||[]).map(c=>`<div class="comment-item">
+          ${avHTML(c.profiles,32)}
+          <div class="comment-body">
+            <div class="comment-author" style="color:${avC(c.profiles?.username||'?')}">${c.profiles?.nombre||''} ${c.profiles?.apellido||''}</div>
+            <div class="comment-text">${c.content}</div>
+            <div class="comment-date">${fmt(c.created_at)}</div>
+          </div>
+        </div>`).join('')}
+      </div>
+    </div>
+
+    <div class="st">${isMe?'MI ACTIVIDAD':'ACTIVIDAD'}</div>
+    ${myActs.length===0?`<div class="empty"><div class="empty-ico">📓</div>Sin actividad aún.</div>`:''}
+    ${myActs.map(a=>`<div class="card">
+      <div class="row" style="margin-bottom:8px;justify-content:space-between">
+        <div>
+          <span style="font-family:'Bebas Neue',cursive;font-size:17px;letter-spacing:1px">${a.routes?.name||'Sesión libre'}</span>
+          ${a.routes?`<span style="margin-left:8px">${gradeBadge(a.routes.grade)}</span>`:''}
+        </div>
+        ${tag(typeL[a.type],typeC[a.type])}
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px">${fmt(a.created_at)} · ${a.zones?.name||''}</div>
+      <div class="metric-row">
+        ${a.attempts?`<div class="metric">🔁 <strong>${a.attempts}</strong> intento${a.attempts>1?'s':''}</div>`:''}
+        ${a.meters?`<div class="metric">📏 <strong>${a.meters}m</strong></div>`:''}
+      </div>
+      ${a.notes?`<p style="font-size:13px;color:#64748b;line-height:1.6">${a.notes}</p>`:''}
+    </div>`).join('')}
+  `;
+}
+
+async function addWallComment(targetUserId) {
+  const inp=$(`wall-input-${targetUserId}`);
+  if(!inp)return;
+  const content=inp.value.trim();
+  if(!content)return;
+  inp.value='';
+  await sb.from('comments').insert({user_id:CU.id,target_user_id:targetUserId,content});
+  await renderProfile();
+}
+
+// ── FAB ───────────────────────────────────────────
+function renderFAB() {
+  const fab=$('fab');
+  if(currentTab==='feed'||currentTab==='profile') {
+    fab.innerHTML=`<button class="fb" onclick="openModal('mo-activity')">📓 Registrar actividad</button>`;
+  } else if(currentTab==='zones') {
+    if(viewingZoneId) {
+      fab.innerHTML=`
+        <button class="fb" onclick="openModal('mo-activity')">📓 Actividad</button>
+        <button class="fb" style="background:var(--bg3);box-shadow:none;border:1px solid var(--border)" onclick="openAddRoute()">➕ Vía</button>
+        <button class="fb" style="background:var(--bg3);box-shadow:none;border:1px solid var(--border)" onclick="openAddAlert()">⚠️ Alerta</button>
+      `;
+    } else {
+      fab.innerHTML=`<button class="fb" onclick="openModal('mo-zone')">🏔️ Nueva zona</button>`;
+    }
+  } else fab.innerHTML='';
+}
+
+// ── MODALS ────────────────────────────────────────
+async function openModal(id) {
+  if(id==='mo-activity') {
+    const zones=cachedZones.length?cachedZones:(await sb.from('zones').select('*').order('name')).data||[];
+    cachedZones=zones;
+    $('act-zone').innerHTML=zones.map(z=>`<option value="${z.id}" ${z.id===viewingZoneId?'selected':''}>${z.name} (${z.country})</option>`).join('');
+    await loadActRoutes();
+  }
+  $(id).classList.add('open');
+}
+function closeModal(id){$(id).classList.remove('open');}
+document.querySelectorAll('.mo').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id);}));
+
+async function loadActRoutes() {
+  const zid=$('act-zone').value;
+  const {data:routes} = await sb.from('routes').select('*').eq('zone_id',zid).order('grade');
+  $('act-route').innerHTML=(routes||[]).length
+    ?(routes||[]).map(r=>`<option value="${r.id}">${r.name} — ${r.grade}</option>`).join('')
+    :'<option value="">Sin vías en esta zona aún</option>';
+}
+function setActType(t){actType=t;['send','attempt','project'].forEach(x=>$(`act-t-${x}`).classList.toggle('active',x===t));}
+function setAlSev(s){alSev=s;[['low','low'],['med','medium'],['hi','high']].forEach(([k,v])=>$(`al-${k}`).classList.toggle('active',v===s));}
+function openAddRoute(){$('nr-zid').value=viewingZoneId;openModal('mo-route');}
+function openAddAlert(){$('na-zid').value=viewingZoneId;openModal('mo-alert');}
+
+// ── SUBMIT FORMS ──────────────────────────────────
+async function submitActivity() {
+  const zoneId=$('act-zone').value, routeId=$('act-route').value;
+  const attempts=parseInt($('act-att').value)||1, meters=parseInt($('act-met').value)||0;
+  const notes=$('act-notes').value.trim(), is_public=$('act-pub').value==='1';
+  if(!zoneId){alert('Selecciona una zona.');return;}
+  setBtnLoading('act-submit',true,'Guardar');
+  const {error} = await sb.from('activities').insert({
+    user_id:CU.id, zone_id:zoneId, route_id:routeId||null,
+    type:actType, attempts, meters, notes, is_public
+  });
+  if(!error) {
+    if(routeId) {
+      await sb.from('routes').update({
+        attempts:actType==='send'?undefined:undefined,
+      }).eq('id',routeId);
+      await sb.rpc('increment_route_stats',{route_id:routeId,new_attempts:attempts,is_send:actType==='send'}).catch(()=>{});
+    }
+    await sb.from('profiles').update({
+      sends:actType==='send'?(CU.sends||0)+1:CU.sends,
+      attempts:(CU.attempts||0)+attempts,
+      meters:(CU.meters||0)+meters,
+    }).eq('id',CU.id);
+    const {data:updatedProfile}=await sb.from('profiles').select('*').eq('id',CU.id).single();
+    if(updatedProfile)CU=updatedProfile;
+  }
+  $('act-notes').value='';$('act-att').value='';$('act-met').value='';
+  setBtnLoading('act-submit',false,'Guardar');
+  closeModal('mo-activity');
+  await renderFeed();
+}
+
+async function submitZone() {
+  const name=$('z-name').value.trim(), region=$('z-region').value.trim();
+  if(!name||!region){alert('Nombre y región son obligatorios.');return;}
+  setBtnLoading('zone-submit',true,'Crear zona');
+  const {error} = await sb.from('zones').insert({
+    name, country:$('z-country').value, region,
+    alt:$('z-alt').value.trim(), style:$('z-style').value,
+    num_routes:parseInt($('z-numr').value)||0,
+    max_grade:$('z-maxg').value.trim()||'?',
+    description:$('z-desc').value.trim(),
+    access:$('z-access').value.trim(),
+    info:$('z-info').value.trim(),
+    created_by:CU.id,
+  });
+  setBtnLoading('zone-submit',false,'Crear zona');
+  if(error){alert('Error al crear la zona: '+error.message);return;}
+  ['z-name','z-region','z-alt','z-maxg','z-desc','z-access','z-info','z-numr'].forEach(id=>$(id).value='');
+  closeModal('mo-zone');
+  cachedZones=[];
+  await renderZones();
+}
+
+async function submitRoute() {
+  const name=$('nr-name').value.trim(), grade=$('nr-grade').value.trim();
+  if(!name||!grade){alert('Nombre y grado son obligatorios.');return;}
+  setBtnLoading('route-submit',true,'Agregar vía');
+  const {error} = await sb.from('routes').insert({
+    zone_id:$('nr-zid').value, name, grade,
+    style:$('nr-style').value, height:$('nr-height').value.trim(),
+    bolts:parseInt($('nr-bolts').value)||0,
+    description:$('nr-desc').value.trim(),
+    sends:0, attempts:0, created_by:CU.id,
+  });
+  setBtnLoading('route-submit',false,'Agregar vía');
+  if(error){alert('Error: '+error.message);return;}
+  ['nr-name','nr-grade','nr-height','nr-bolts','nr-desc'].forEach(id=>$(id).value='');
+  closeModal('mo-route');
+  await renderZoneDetail();
+}
+
+async function submitAlert() {
+  const title=$('na-title').value.trim(), content=$('na-content').value.trim();
+  if(!title||!content){alert('Completa título y descripción.');return;}
+  setBtnLoading('alert-submit',true,'Publicar');
+  const {error} = await sb.from('alerts').insert({
+    zone_id:$('na-zid').value, title, content,
+    severity:alSev, created_by:CU.id,
+  });
+  setBtnLoading('alert-submit',false,'Publicar');
+  if(error){alert('Error: '+error.message);return;}
+  $('na-title').value='';$('na-content').value='';
+  closeModal('mo-alert');
+  await renderZoneDetail();
+}
+
+// ── BOOT ──────────────────────────────────────────
+sb.auth.onAuthStateChange(async (event, session) => {
+  if(session?.user) await loadSession(session.user);
+});
+$('l-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+</script>
+</body>
+</html>
